@@ -3,6 +3,9 @@ import { env } from "~/env";
 
 export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_BASE_URL,
+  endpoints: {
+    signOut: "/api/auth/signout"
+  }
 });
 
 export const {

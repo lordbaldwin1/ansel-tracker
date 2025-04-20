@@ -6,11 +6,10 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardFooter,
 } from "~/components/ui/card";
 import { useState } from "react";
-import { signIn } from "~/lib/auth-client";
+import { signIn } from "~/lib/auth/auth-client";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 
@@ -18,12 +17,9 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Card className="max-w-md">
+    <Card className="max-w-lg">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
-        <CardDescription className="text-xs md:text-sm">
-          Enter your email below to login to your account
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
