@@ -13,6 +13,9 @@ export default function Navbar() {
           <Link prefetch={true} className="text-2xl font-bold" href="/">
           💰 Ansel Tracker 🗡️
           </Link>
+          <Link className="hover:text-muted-foreground" href="/finance">
+            Finance
+          </Link>
         </div>
 
         <div className="flex items-center justify-end gap-4">

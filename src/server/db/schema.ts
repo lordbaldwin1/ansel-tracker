@@ -1,25 +1,48 @@
-import { sql } from "drizzle-orm";
-import { index, sqliteTableCreator, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTableCreator, text, integer, real } from "drizzle-orm/sqlite-core";
 
 export const createTable = sqliteTableCreator(
   (name) => `ansel-tracker_${name}`,
 );
 
-export const posts = createTable(
-  "post",
-  (d) => ({
-    id: d.integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
-    name: d.text({ length: 256 }),
-    createdAt: d
-      .integer({ mode: "timestamp" })
-      .default(sql`(unixepoch())`)
-      .notNull(),
-    updatedAt: d.integer({ mode: "timestamp" }).$onUpdate(() => new Date()),
-  }),
-  (t) => [
-    index("name_idx").on(t.name),
-  ],
-);
+// Plaid specific tables
+export const plaidItems = createTable("plaid_item", {
+  id: text('id').primaryKey(),
+  itemId: text('item_id').notNull().unique(),
+  accessToken: text('access_token').notNull(),
+  institutionId: text('institution_id').notNull(),
+  institutionName: text('institution_name'),
+  institutionLogo: text('institution_logo'),
+  accountId: text('account_id').notNull().references(() => accounts.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});
+
+export type PlaidItem = typeof plaidItems.$inferSelect;
+
+export const plaidAccounts = createTable("plaid_account", {
+  id: text('id').primaryKey(),
+  plaidId: text('plaid_id').notNull().unique(),
+  name: text('name').notNull(),
+  nickname: text('nickname'),
+  type: text('type').notNull(),
+  subtype: text('subtype'),
+  mask: text('mask'),
+  hidden: integer('hidden', { mode: 'boolean' }).default(false),
+  plaidItemId: text('plaid_item_id').notNull().references(() => plaidItems.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});
+
+export type PlaidAccount = typeof plaidAccounts.$inferSelect;
+
+export const accountBalances = createTable("account_balance", {
+  id: text('id').primaryKey(),
+  plaidAccountId: text('plaid_account_id').notNull().references(() => plaidAccounts.id, { onDelete: 'cascade' }),
+  current: real('current').notNull(),
+  available: real('available').notNull(),
+  limit: real('limit'),
+  date: integer('date', { mode: 'timestamp' }).notNull(),
+});
 
 // Auth tables
 export const users = createTable("user", {

@@ -13,6 +13,9 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.string().url(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    PLAID_CLIENT_ID: z.string(),
+    PLAID_SECRET: z.string(),
+    PLAID_ENV: z.enum(["sandbox", "development", "production"]),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -41,6 +44,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    PLAID_CLIENT_ID: process.env.PLAID_CLIENT_ID,
+    PLAID_SECRET: process.env.PLAID_SECRET,
+    PLAID_ENV: process.env.PLAID_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

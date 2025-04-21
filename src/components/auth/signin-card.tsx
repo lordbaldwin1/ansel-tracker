@@ -7,20 +7,24 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
+  CardDescription,
 } from "~/components/ui/card";
 import { useState } from "react";
 import { signIn } from "~/lib/auth/auth-client";
 import Link from "next/link";
 import { cn } from "~/lib/utils";
 
-export default function SignIn() {
+export default function SignIn(props: { redirect?: string }) {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Card className="max-w-lg">
+    <Card className="max-w-xl">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
+        <CardTitle className="flex justify-center text-md md:text-xl whitespace-nowrap">Welcome to 💰 Ansel Tracker 🗡️</CardTitle>
       </CardHeader>
+      <CardDescription className="text-sm max-w-[80%] mx-auto text-center">
+        Sign in to track your finances from anywhere in the world.
+      </CardDescription>
       <CardContent>
         <div className="grid gap-4">
           <div
@@ -37,7 +41,7 @@ export default function SignIn() {
                 await signIn.social(
                   {
                     provider: "google",
-                    callbackURL: "/",
+                    callbackURL: props.redirect ?? "/",
                   },
                   {
                     onRequest: () => {

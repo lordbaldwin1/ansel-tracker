@@ -25,8 +25,8 @@ export default function AuthButtonsDropdown() {
             src={session.user.image}
             className="rounded-full hover:opacity-80"
             alt="User options"
-            width={32}
-            height={32}
+            width={24}
+            height={24}
           />
         ) : (
           <Button variant="ghost" size="icon">
