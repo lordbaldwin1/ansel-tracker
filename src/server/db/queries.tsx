@@ -1,6 +1,6 @@
 import { db } from "./index";
 import { plaidItems, plaidAccounts, accountBalances } from "./schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, and, max, desc } from "drizzle-orm";
 
 export async function getPlaidItem(userId: string) {
   const plaidItem = await db.query.plaidItems.findFirst({
@@ -15,7 +15,7 @@ export async function getPlaidAccounts(plaidItemId: string) {
     .from(plaidAccounts)
     .where(eq(plaidAccounts.plaidItemId, plaidItemId));
   return accounts;
-};
+}
 
 export async function getAccountBalances(accountIds: string[]) {
   const balances = await db
@@ -30,6 +30,31 @@ export async function getAccountsJoinedWithBalances(plaidItemId: string) {
     .select()
     .from(plaidAccounts)
     .where(eq(plaidAccounts.plaidItemId, plaidItemId))
-    .leftJoin(accountBalances, eq(plaidAccounts.id, accountBalances.plaidAccountId));
+    .leftJoin(
+      accountBalances,
+      eq(plaidAccounts.id, accountBalances.plaidAccountId),
+    )
+    .orderBy(desc(accountBalances.date));
+  return accounts;
+}
+
+export async function getMostRecentAccountsAndBalances(plaidItemId: string) {
+  const accounts = await db
+    .select({ plaid_account: plaidAccounts, account_balance: accountBalances })
+    .from(plaidAccounts)
+    .leftJoin(
+      accountBalances,
+      and(
+        eq(plaidAccounts.id, accountBalances.plaidAccountId),
+        eq(
+          accountBalances.date,
+          db
+            .select({ maxDate: max(accountBalances.date) })
+            .from(accountBalances)
+            .where(eq(accountBalances.plaidAccountId, plaidAccounts.id)),
+        ),
+      ),
+    )
+    .where(eq(plaidAccounts.plaidItemId, plaidItemId));
   return accounts;
 }
