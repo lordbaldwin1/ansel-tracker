@@ -1,78 +1,54 @@
-import { BellRing } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { cn } from "~/lib/utils";
-import { Switch } from "~/components/ui/switch";
-import Link from "next/link";
+import { getSession } from "~/lib/auth/getSession";
+import { getPlaidItem, getAccountsJoinedWithBalances } from "~/server/db/queries";
+import { db } from "~/server/db";
+import { accounts } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
-const notifications = [
-  {
-    title: "Your call has been confirmed.",
-    description: "1 hour ago",
-  },
-  {
-    title: "You have a new message!",
-    description: "1 hour ago",
-  },
-  {
-    title: "Your subscription is expiring soon!",
-    description: "2 hours ago",
-  },
-];
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+}
 
-export default function Page() {
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+}
+
+export default async function Page() {
+  const session = await getSession();
+  if (!session) {
+    return <div>No session found</div>;
+  }
+
+  const userId = await db.query.accounts.findFirst({
+    where: eq(accounts.userId, session.user.id),
+  });
+  if (!userId) {
+    return <div>No user id found</div>;
+  }
+  const plaidItem = await getPlaidItem(userId.id);
+  if (!plaidItem) {
+    return <div>No plaid item found</div>;
+  }
+  const plaidAccounts = await getAccountsJoinedWithBalances(plaidItem.id);
+
   return (
-    <div className="flex h-screen items-start justify-center mx-4">
-      <Card className={cn("w-[380px]")}>
-        <CardHeader>
-          <CardTitle>Finance Summary</CardTitle>
-          <CardDescription>View, edit, and add your finance data.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="flex items-center space-x-4 rounded-md border p-4">
-            <BellRing />
-            <div className="flex-1 space-y-1">
-              <p className="text-sm leading-none font-medium">
-                Push Notifications
-              </p>
-              <p className="text-muted-foreground text-sm">
-                Send notifications to device.
-              </p>
-            </div>
-            <Switch />
-          </div>
-          <div>
-            {notifications.map((notification, index) => (
-              <div
-                key={index}
-                className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
-              >
-                <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                <div className="space-y-1">
-                  <p className="text-sm leading-none font-medium">
-                    {notification.title}
-                  </p>
-                  <p className="text-muted-foreground text-sm">
-                    {notification.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Link href="/finance" className="w-full">
-            <Button className="w-full">Go to Finance</Button>
-          </Link>
-        </CardFooter>
-      </Card>
+    <div className="flex flex-col items-center h-screen">
+      <h1>Accounts</h1>
+      {plaidAccounts.map((account) => (
+        <div key={account.account_balance?.id}>
+          <h1>{`${account.plaid_account.name} - ${formatCurrency(account.account_balance?.current ?? 0)} - ${account.account_balance?.date ? formatDate(account.account_balance.date) : 'No date'}`}</h1>
+        </div>
+      ))}
     </div>
   );
 }

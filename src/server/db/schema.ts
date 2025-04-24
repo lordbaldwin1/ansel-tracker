@@ -44,6 +44,8 @@ export const accountBalances = createTable("account_balance", {
   date: integer('date', { mode: 'timestamp' }).notNull(),
 });
 
+export type AccountBalance = typeof accountBalances.$inferSelect;
+
 // Auth tables
 export const users = createTable("user", {
   id: text('id').primaryKey(),

@@ -10,11 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { authClient } from "~/lib/auth/auth-client";
 import SignoutButton from "./signout-button";
 import Image from "next/image";
-export default function AuthButtonsDropdown() {
-  const { data: session, isPending } = authClient.useSession();
+import type { Session } from "~/lib/auth/auth-client";
+
+export default function AuthButtonsDropdown(props: { session: Session | null, isPending: boolean }) {
+  const { session, isPending } = props;
   if (isPending) return <div>Loading...</div>;
 
   return (
