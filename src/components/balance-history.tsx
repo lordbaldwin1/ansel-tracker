@@ -67,7 +67,7 @@ export default function BalanceHistory(props: {
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                          <div className="space-y-3">
+                          <div className="space-y-3 mx-8 border rounded-lg p-4">
                             {account.balances.map((balance) => (
                               <div
                                 key={String(balance.id)}
