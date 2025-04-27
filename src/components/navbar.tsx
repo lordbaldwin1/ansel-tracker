@@ -5,6 +5,7 @@ import { ModeToggle } from "./mode-toggle";
 import AuthButtonsDropdown from "./auth/auth-buttons-dropdown";
 import { authClient } from "~/lib/auth/auth-client";
 import PlaidLinkButton from "./plaid-link-button";
+import UpdateBalancesButton from "./update-balances-button";
 import { Button } from "./ui/button";
 import { Suspense } from "react";
 
@@ -17,13 +18,15 @@ export default function Navbar() {
           <Link prefetch={true} className="text-2xl font-bold" href="/">
             💰 Ansel Tracker 🗡️
           </Link>
-          <Link className="hover:text-muted-foreground" href="/finance">
-            Finance
-          </Link>
           {session?.user.id ? (
-            <Suspense fallback={<Button variant="default">Loading...</Button>}>
-              <PlaidLinkButton userId={session.user.id} />
-            </Suspense>
+            <>
+              <Suspense fallback={<Button variant="default">Loading...</Button>}>
+                <PlaidLinkButton userId={session.user.id} />
+              </Suspense>
+              <Suspense fallback={<Button variant="default">Loading...</Button>}>
+                <UpdateBalancesButton userId={session.user.id} />
+              </Suspense>
+            </>
           ) : (
             <Link className="text-muted-foreground" href="/sign-in">
               <Button className="hover:cursor-pointer" variant="outline">

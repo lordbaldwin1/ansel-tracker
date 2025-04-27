@@ -1,11 +1,8 @@
 // Map of institution IDs to their logo URLs
 export const institutionLogos: Record<string, string> = {
-  // Wells Fargo
   ins_127991:
-    "https://upload.wikimedia.org/wikipedia/commons/b/b3/Wells_Fargo_Bank.svg",
-  // E*TRADE
-  ins_129473: "https://upload.wikimedia.org/wikipedia/commons/2/22/ETrade.svg",
-  // Add more institutions as needed
+    "https://upload.wikimedia.org/wikipedia/commons/b/b3/Wells_Fargo_Bank.svg", // Wells Fargo
+  ins_129473: "https://upload.wikimedia.org/wikipedia/commons/2/22/ETrade.svg", // E*TRADE
   ins_1:
     "https://upload.wikimedia.org/wikipedia/commons/4/4f/Chase_Bank_logo.svg", // Chase
   ins_2:
@@ -21,4 +18,6 @@ export const institutionLogos: Record<string, string> = {
     "https://upload.wikimedia.org/wikipedia/commons/3/3b/Navy_Federal_Credit_Union_logo.svg", // Navy Federal
   ins_10: "https://upload.wikimedia.org/wikipedia/commons/a/a0/USAA_logo.svg", // USAA
   coinbase: "/coinbase.webp", // Coinbase
+  ins_56:
+    "https://upload.wikimedia.org/wikipedia/commons/4/4f/Chase_Bank_logo.svg", // Chase
 };
