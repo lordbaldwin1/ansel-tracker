@@ -13,6 +13,9 @@ export async function POST(req: Request) {
       products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: "en",
+      transactions: {
+        days_requested: 730, // 2 years
+      },
     };
 
     const response = await plaidClient.linkTokenCreate(request);

@@ -1,4 +1,5 @@
 import { sqliteTableCreator, text, integer, real } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
 
 export const createTable = sqliteTableCreator(
   (name) => `ansel-tracker_${name}`,
@@ -33,6 +34,18 @@ export const plaidAccounts = createTable("plaid_account", {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
+// Define relations
+export const plaidAccountRelations = relations(plaidAccounts, ({ one }) => ({
+  plaidItem: one(plaidItems, {
+    fields: [plaidAccounts.plaidItemId],
+    references: [plaidItems.id],
+  }),
+}));
+
+export const plaidItemRelations = relations(plaidItems, ({ many }) => ({
+  plaidAccounts: many(plaidAccounts),
+}));
+
 export type PlaidAccount = typeof plaidAccounts.$inferSelect;
 
 export const accountBalances = createTable("account_balance", {
@@ -46,6 +59,77 @@ export const accountBalances = createTable("account_balance", {
 
 export type AccountBalance = typeof accountBalances.$inferSelect;
 
+export const transactions = createTable("transaction", {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull().references(() => plaidAccounts.id, { onDelete: 'cascade' }),
+  plaidTransactionId: text('plaid_transaction_id').notNull().unique(),
+  date: integer('date', { mode: 'timestamp' }).notNull(),
+  amount: real('amount').notNull(),
+  name: text('name').notNull(),
+  category: text('category'),
+  merchantName: text('merchant_name'),
+  pending: integer('pending', { mode: 'boolean' }).notNull().default(false),
+  // security fields
+  securityId: text('security_id'),
+  tickerSymbol: text('ticker_symbol'),
+  isin: text('isin'),
+  cusip: text('cusip'),
+  sedol: text('sedol'),
+  institutionSecurityId: text('institution_security_id'),
+  securityName: text('security_name'),
+  securityType: text('security_type'),
+  closePrice: real('close_price'),
+  closePriceAsOf: integer('close_price_as_of', { mode: 'timestamp' }),
+  isCashEquivalent: integer('is_cash_equivalent', { mode: 'boolean' }),
+  type: text('type'),
+  subtype: text('subtype'),
+  isoCurrencyCode: text('iso_currency_code'),
+  unofficialCurrencyCode: text('unofficial_currency_code'),
+  marketIdentifierCode: text('market_identifier_code'),
+  sector: text('sector'),
+  industry: text('industry'),
+  // regular transaction fields
+  authorizedDate: integer('authorized_date', { mode: 'timestamp' }),
+  authorizedDatetime: integer('authorized_datetime', { mode: 'timestamp' }),
+  datetime: integer('datetime', { mode: 'timestamp' }),
+  paymentChannel: text('payment_channel'),
+  transactionCode: text('transaction_code'),
+  personalFinanceCategory: text('personal_finance_category'),
+  merchantEntityId: text('merchant_entity_id'),
+  // location fields
+  locationAddress: text('location_address'),
+  locationCity: text('location_city'),
+  locationRegion: text('location_region'),
+  locationPostalCode: text('location_postal_code'),
+  locationLatitude: real('location_latitude'),
+  locationLongitude: real('location_longitude'),
+  // payment metadata
+  byOrderOf: text('by_order_of'),
+  payee: text('payee'),
+  payer: text('payer'),
+  paymentMethod: text('payment_method'),
+  paymentProcessor: text('payment_processor'),
+  ppd_id: text('ppd_id'),
+  reason: text('reason'),
+  referenceNumber: text('reference_number'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});
+
+export type Transaction = typeof transactions.$inferSelect;
+
+export const transactionDownloadLogs = createTable("transaction_download_log", {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull().references(() => plaidAccounts.id, { onDelete: 'cascade' }),
+  startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
+  endDate: integer('end_date', { mode: 'timestamp' }).notNull(),
+  numTransactions: integer('num_transactions').notNull(),
+  status: text('status').notNull(),
+  errorMessage: text('error_message'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+});
+
+export type TransactionDownloadLog = typeof transactionDownloadLogs.$inferSelect;
 // Auth tables
 export const users = createTable("user", {
   id: text('id').primaryKey(),

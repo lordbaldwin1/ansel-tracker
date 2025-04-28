@@ -1,0 +1,1 @@
+ALTER TABLE `ansel-tracker_transaction` ADD `date` integer NOT NULL;

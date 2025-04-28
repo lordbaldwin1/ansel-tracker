@@ -29,6 +29,27 @@
       "when": 1745276916046,
       "tag": "0003_melted_firebird",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1745791437175,
+      "tag": "0004_warm_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1745792996092,
+      "tag": "0005_special_prism",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1745793041522,
+      "tag": "0006_shocking_mysterio",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { plaidItems, plaidAccounts, accountBalances } from "./schema";
+import { plaidItems, plaidAccounts, accountBalances, transactions } from "./schema";
 import { eq, and, max, desc } from "drizzle-orm";
 import type { HierarchicalPlaidItem } from "~/lib/types";
 
@@ -119,5 +119,27 @@ export async function getBalanceHistoryGroupedByInstitution(
   }, {} as Record<string, HierarchicalPlaidItem>);
 
   return Object.values(groupedItems);
+}
+
+export async function getAccountBalances(accountId: string) {
+  const balances = await db.query.accountBalances.findMany({
+    where: eq(accountBalances.plaidAccountId, accountId),
+  });
+  return balances;
+}
+
+export async function getMostRecentAccountBalance(accountId: string) {
+  const balance = await db.query.accountBalances.findFirst({
+    where: eq(accountBalances.plaidAccountId, accountId),
+    orderBy: desc(accountBalances.date),
+  });
+  return balance;
+}
+
+export async function getTransactions(accountId: string) {
+  const trans = await db.query.transactions.findMany({
+    where: eq(transactions.accountId, accountId),
+  });
+  return trans;
 }
 
