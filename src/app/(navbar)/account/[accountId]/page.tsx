@@ -5,10 +5,15 @@ import { notFound } from "next/navigation";
 import { getSession } from "~/lib/auth/getSession";
 import { db } from "~/server/db";
 import { accounts, plaidItems, plaidAccounts } from "~/server/db/schema";
-import { getMostRecentAccountBalance, getTransactions } from "~/server/db/queries";
+import {
+  getMostRecentAccountBalance,
+  getTransactions,
+} from "~/server/db/queries";
 import { formatCurrency, formatDate } from "~/lib/utils";
 import TransactionsButton from "~/components/transactions-button";
-
+import { Button } from "~/components/ui/button";
+import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
+import { Suspense } from "react";
 export default async function AccountPage(props: {
   params: Promise<{ accountId: string }>;
 }) {
@@ -65,8 +70,8 @@ export default async function AccountPage(props: {
   ]);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="mx-auto max-w-4xl p-6">
+      <div className="mb-8 flex items-center justify-center gap-4">
         {accountInformation.plaidItem.institutionLogo ? (
           <Image
             src={accountInformation.plaidItem.institutionLogo}
@@ -76,57 +81,91 @@ export default async function AccountPage(props: {
             className="rounded-lg"
           />
         ) : (
-          <PiggyBank className="h-16 w-16 text-gray-400" />
+          <PiggyBank className="h-16 w-16" />
         )}
         <div>
           <h1 className="text-2xl font-bold">{accountInformation.name}</h1>
-          <p className="text-gray-600">{accountInformation.plaidItem.institutionName}</p>
+          <p>{accountInformation.plaidItem.institutionName}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Account Details</h2>
-          <div className="space-y-2">
-            <p><span className="text-gray-600">Type:</span> {accountInformation.type}</p>
-            <p><span className="text-gray-600">Subtype:</span> {accountInformation.subtype}</p>
+      <div className="flex justify-center">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="rounded-lg p-6 shadow">
+            <h2 className="mb-4 text-lg font-semibold">Account Details</h2>
+            <div className="space-y-2">
+              <p className="text-muted-foreground">
+                <span className="text-foreground">Type:</span>{" "}
+                {accountInformation.type}
+              </p>
+              <p className="text-muted-foreground">
+                <span className="text-foreground">Subtype:</span>{" "}
+                {accountInformation.subtype}
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-lg p-6 shadow">
+            <h2 className="mb-4 text-lg font-semibold">Current Balance</h2>
+            <div className="space-y-2">
+              <p>
+                <span>Current:</span>{" "}
+                {formatCurrency(mostRecentBalance?.current ?? 0)}
+              </p>
+              <p>
+                <span>Available:</span>{" "}
+                {formatCurrency(mostRecentBalance?.available ?? 0)}
+              </p>
+              {mostRecentBalance?.limit && (
+                <p>
+                  <span>Limit:</span> {formatCurrency(mostRecentBalance.limit)}
+                </p>
+              )}
+              {mostRecentBalance?.date && (
+                <p className="text-muted-foreground">
+                  As of {formatDate(mostRecentBalance.date)}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Current Balance</h2>
-          <div className="space-y-2">
-            <p><span className="text-gray-600">Current:</span> {formatCurrency(mostRecentBalance?.current ?? 0)}</p>
-            <p><span className="text-gray-600">Available:</span> {formatCurrency(mostRecentBalance?.available ?? 0)}</p>
-            {mostRecentBalance?.limit && (
-              <p><span className="text-gray-600">Limit:</span> {formatCurrency(mostRecentBalance.limit)}</p>
-            )}
-            {mostRecentBalance?.date && (
-              <p className="text-sm text-gray-500">As of {formatDate(mostRecentBalance.date)}</p>
-            )}
-          </div>
-        </div>
       </div>
 
-      <div className="mb-8">
-        <TransactionsButton accountId={urlDecodedAccountId} userId={authAccount.userId} />
+      <div className="mb-8 flex items-center justify-center gap-4">
+        <TransactionsButton
+          accountId={urlDecodedAccountId}
+          userId={authAccount.userId}
+        />
+        <Button>Refresh Balance (TODO)</Button>
       </div>
+      <Suspense fallback={<div>Loading...</div>}>
+          <CategoryBreakdownCard chartData={transactions} />
+      </Suspense>
 
       {transactions.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">Recent Transactions</h2>
+        <div className="rounded-lg shadow">
+          <div className="border-b p-6">
+            <h2 className="text-lg font-semibold">Transaction History</h2>
           </div>
           <div className="divide-y">
             {transactions.map((transaction) => (
-              <div key={transaction.id} className="p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-center">
+              <div key={transaction.id} className="hover:bg-card p-4">
+                <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{transaction.name}</p>
-                    <p className="text-sm text-gray-500">{formatDate(transaction.date)}</p>
+                    <p className="font-medium">
+                      {transaction.name} | {transaction.personalFinanceCategory}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {formatDate(transaction.date)}
+                    </p>
                   </div>
-                  <p className={`font-medium ${transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(transaction.amount)}
+                  {/* -amount means account is gaining money, +amount means account is losing money */}
+                  <p
+                    className={`font-medium ${transaction.amount < 0 ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {transaction.amount < 0
+                      ? `+${formatCurrency(Math.abs(transaction.amount))}`
+                      : `-${formatCurrency(Math.abs(transaction.amount))}`}
                   </p>
                 </div>
               </div>
