@@ -8,10 +8,9 @@ export interface ApiResponse {
   success: boolean;
   message: string;
   error?: string;
-  numTransactions?: number;
 }
 
-export function TransactionsButtonClient({
+export function UpdateSingleBalanceButtonClient({
   action,
 }: {
   action: () => Promise<ApiResponse>;
@@ -23,9 +22,7 @@ export function TransactionsButtonClient({
     try {
       const response = await action();
       if (response.success) {
-        toast.success(response.message, {
-          description: `${response.numTransactions} transactions fetched successfully`,
-        });
+        toast.success(response.message);
       } else {
         toast.error(response.message);
       }
@@ -39,7 +36,7 @@ export function TransactionsButtonClient({
 
   return (
     <Button onClick={handleSubmit} disabled={isPending}>
-      {isPending ? "Fetching..." : "Update Transactions"}
+      {isPending ? "Fetching..." : "Update Balance"}
     </Button>
-  );
+  )
 }

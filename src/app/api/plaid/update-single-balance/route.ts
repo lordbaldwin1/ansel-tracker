@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSession } from "~/lib/auth/getSession";
 import { plaidClient } from "~/lib/plaid";
 import { db } from "~/server/db";
 import {
@@ -10,33 +9,12 @@ import {
 } from "~/server/db/schema";
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session?.user) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Unauthorized",
-        error: "UNAUTHORIZED",
-      },
-      { status: 401 },
-    );
-  }
 
   try {
     const { userId, plaidAccountId } = (await req.json()) as {
       userId: string;
       plaidAccountId: string;
     };
-    if (userId !== session.user.id) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized",
-          error: "UNAUTHORIZED",
-        },
-        { status: 401 },
-      );
-    }
 
     const authAccount = await db.query.accounts.findFirst({
       where: eq(accounts.userId, userId),
@@ -75,7 +53,7 @@ export async function POST(req: NextRequest) {
     });
 
     const account = accountResponse.data.accounts.find(
-      (a) => a.account_id === plaidAccount.id,
+      (a) => a.account_id === plaidAccount.plaidId,
     );
 
     if (!account) {
@@ -91,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     await db.insert(accountBalances).values({
       id: crypto.randomUUID(),
-      plaidAccountId: account.account_id,
+      plaidAccountId: plaidAccount.id,
       current: account.balances.current ?? 0,
       available: account.balances.available ?? 0,
       limit: account.balances.limit ?? undefined,

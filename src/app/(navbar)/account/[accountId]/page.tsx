@@ -11,9 +11,10 @@ import {
 } from "~/server/db/queries";
 import { formatCurrency, formatDate } from "~/lib/utils";
 import TransactionsButton from "~/components/transactions-button";
-import { Button } from "~/components/ui/button";
 import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
 import { Suspense } from "react";
+import UpdateSingleBalanceButton from "~/components/single-balance-button";
+import { BalanceHistoryChart } from "~/components/balance-history-graph";
 
 export default async function AccountPage(props: {
   params: Promise<{ accountId: string }>;
@@ -137,11 +138,17 @@ export default async function AccountPage(props: {
           accountId={urlDecodedAccountId}
           userId={authAccount.userId}
         />
-        <Button>Update Balance (TODO)</Button>
-        <Button>Update Both</Button>
+        <UpdateSingleBalanceButton
+          plaidAccountId={urlDecodedAccountId}
+          userId={authAccount.userId}
+        />
+        {/* <Button>Update Both (TODO)</Button> */}
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-          <CategoryBreakdownCard chartData={transactions} />
+        <BalanceHistoryChart />
+      </Suspense>
+      <Suspense fallback={<div>Loading...</div>}>
+        <CategoryBreakdownCard chartData={transactions} />
       </Suspense>
 
       {transactions.length > 0 && (
@@ -155,7 +162,7 @@ export default async function AccountPage(props: {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">
-                      {transaction.name} | {transaction.personalFinanceCategory}
+                      {transaction.name}
                     </p>
                     <p className="text-muted-foreground">
                       {formatDate(transaction.date)}

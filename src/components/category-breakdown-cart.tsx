@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useMediaQuery } from "~/hooks/use-media-query";
 
 const chartConfig = {
   INCOME: {
@@ -93,37 +94,87 @@ type PieData = {
   fill: string;
 };
 
+type ChartSizeConfig = {
+  innerRadius: number;
+  outerRadius: number;
+  strokeWidth: number;
+  maxHeight: number;
+  textSize: string;
+  totalTextSize: string;
+  legendGap: number;
+};
+
+const sizeConfig: Record<string, ChartSizeConfig> = {
+  mobile: {
+    innerRadius: 40,
+    outerRadius: 60,
+    strokeWidth: 2,
+    maxHeight: 200,
+    textSize: "text-lg",
+    totalTextSize: "text-sm",
+    legendGap: 2,
+  },
+  tablet: {
+    innerRadius: 60,
+    outerRadius: 80,
+    strokeWidth: 3,
+    maxHeight: 250,
+    textSize: "text-xl",
+    totalTextSize: "text-base",
+    legendGap: 4,
+  },
+  desktop: {
+    innerRadius: 100,
+    outerRadius: 120,
+    strokeWidth: 5,
+    maxHeight: 325,
+    textSize: "text-2xl",
+    totalTextSize: "text-xl",
+    legendGap: 8,
+  },
+};
+
 const CategoryPieChart = (props: {
   pieData: PieData[];
   timeRange: string;
 }) => {
   const totalAmount = props.pieData.reduce((acc, item) => acc + item.amount, 0);
+  const isMobile = useMediaQuery("(max-width: 640px)");
+  const isTablet = useMediaQuery("(max-width: 1024px)");
+
+  const currentConfig = (() => {
+    if (isMobile) return sizeConfig.mobile;
+    if (isTablet) return sizeConfig.tablet;
+    return sizeConfig.desktop;
+  })()!;
 
   return (
     <Card className="flex flex-col justify-center w-full">
       <CardHeader className="items-center pb-0">
-        <CardTitle>{props.timeRange}</CardTitle>
+        <CardTitle className={currentConfig.textSize}>{props.timeRange}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[325px]"
+          className={`mx-auto aspect-square max-h-[${currentConfig.maxHeight}px]`}
         >
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <ChartLegend
               content={
-                <ChartLegendContent className="flex flex-wrap justify-center gap-x-8 gap-y-2" />
+                <ChartLegendContent
+                  className={`flex flex-wrap justify-center gap-x-${currentConfig.legendGap} gap-y-2 text-xs sm:text-sm`}
+                />
               }
             />
             <Pie
               data={props.pieData}
               dataKey="amount"
               nameKey="category"
-              innerRadius={100}
-              outerRadius={120}
+              innerRadius={currentConfig.innerRadius}
+              outerRadius={currentConfig.outerRadius}
               paddingAngle={2}
-              strokeWidth={5}
+              strokeWidth={currentConfig.strokeWidth}
             >
               {props.pieData.map((entry, index) => (
                 <Pie
@@ -147,14 +198,14 @@ const CategoryPieChart = (props: {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          className={`fill-foreground ${currentConfig.totalTextSize} font-bold`}
                         >
                           ${totalAmount.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy ?? 0) + 24}
-                          className="fill-muted-foreground"
+                          y={(viewBox.cy ?? 0) + (isMobile ? 16 : 24)}
+                          className="fill-muted-foreground text-xs sm:text-sm"
                         >
                           Total
                         </tspan>
@@ -167,9 +218,9 @@ const CategoryPieChart = (props: {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+      <CardFooter className="flex-col gap-2 text-xs sm:text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
-          <TrendingUp className="h-4 w-4" />
+          <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
           Spending Overview
         </div>
         <div className="text-muted-foreground leading-none">
