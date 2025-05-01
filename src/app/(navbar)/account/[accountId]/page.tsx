@@ -6,6 +6,7 @@ import { getSession } from "~/lib/auth/getSession";
 import { db } from "~/server/db";
 import { accounts, plaidItems, plaidAccounts } from "~/server/db/schema";
 import {
+  getAccountBalances,
   getMostRecentAccountBalance,
   getTransactions,
 } from "~/server/db/queries";
@@ -66,9 +67,10 @@ export default async function AccountPage(props: {
     return notFound();
   }
 
-  const [mostRecentBalance, transactions] = await Promise.all([
+  const [mostRecentBalance, transactions, balanceHistory] = await Promise.all([
     getMostRecentAccountBalance(urlDecodedAccountId),
     getTransactions(urlDecodedAccountId),
+    getAccountBalances(urlDecodedAccountId),
   ]);
 
   return (
@@ -145,7 +147,7 @@ export default async function AccountPage(props: {
         {/* <Button>Update Both (TODO)</Button> */}
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <BalanceHistoryChart />
+        <BalanceHistoryChart accountBalances={balanceHistory} />
       </Suspense>
       <Suspense fallback={<div>Loading...</div>}>
         <CategoryBreakdownCard chartData={transactions} />
