@@ -93,17 +93,16 @@ type PieData = {
   fill: string;
 };
 
-const CategoryBreakdownChart = (props: {
+const CategoryPieChart = (props: {
   pieData: PieData[];
   timeRange: string;
 }) => {
   const totalAmount = props.pieData.reduce((acc, item) => acc + item.amount, 0);
 
   return (
-    <Card className="flex flex-col w-full md:w-[400px]">
+    <Card className="flex flex-col justify-center w-full">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Spending by Category</CardTitle>
-        <CardDescription>{props.timeRange}</CardDescription>
+        <CardTitle>{props.timeRange}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -202,7 +201,7 @@ export const CategoryBreakdownChartAllTime = (props: {
     return acc;
   }, []);
 
-  return <CategoryBreakdownChart pieData={pieData} timeRange="All time" />;
+  return <CategoryPieChart pieData={pieData} timeRange="All time" />;
 };
 
 export const CategoryBreakdownChartLast30Days = (props: {
@@ -231,7 +230,7 @@ export const CategoryBreakdownChartLast30Days = (props: {
     return acc;
   }, []);
 
-  return <CategoryBreakdownChart pieData={pieData} timeRange="Last 30 days" />;
+  return <CategoryPieChart pieData={pieData} timeRange="Last 30 days" />;
 };
 
 export const CategoryBreakdownChartLast7Days = (props: {
@@ -260,7 +259,7 @@ export const CategoryBreakdownChartLast7Days = (props: {
     return acc;
   }, []);
 
-  return <CategoryBreakdownChart pieData={pieData} timeRange="Last 7 days" />;
+  return <CategoryPieChart pieData={pieData} timeRange="Last 7 days" />;
 };
 
 // TODO: Maybe make a time frame selector!!!
@@ -271,7 +270,7 @@ export const CategoryBreakdownCard = (props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Spending by Category</CardTitle>
+        <CardTitle>Transactions by Category</CardTitle>
         <CardDescription>View your spending patterns over different time periods</CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">

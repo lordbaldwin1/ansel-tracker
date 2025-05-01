@@ -14,6 +14,7 @@ import TransactionsButton from "~/components/transactions-button";
 import { Button } from "~/components/ui/button";
 import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
 import { Suspense } from "react";
+
 export default async function AccountPage(props: {
   params: Promise<{ accountId: string }>;
 }) {
@@ -136,7 +137,8 @@ export default async function AccountPage(props: {
           accountId={urlDecodedAccountId}
           userId={authAccount.userId}
         />
-        <Button>Refresh Balance (TODO)</Button>
+        <Button>Update Balance (TODO)</Button>
+        <Button>Update Both</Button>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
           <CategoryBreakdownCard chartData={transactions} />

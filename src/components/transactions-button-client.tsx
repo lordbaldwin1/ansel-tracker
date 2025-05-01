@@ -34,7 +34,7 @@ export function TransactionsButtonClient({ action }: { action: () => Promise<Api
 
   return (
     <Button onClick={handleSubmit} disabled={isPending}>
-      {isPending ? "Fetching..." : "Get Transactions"}
+      {isPending ? "Fetching..." : "Update Transactions"}
     </Button>
   );
 } 
