@@ -16,6 +16,7 @@ import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
 import { Suspense } from "react";
 import UpdateSingleBalanceButton from "~/components/single-balance-button";
 import { BalanceHistoryChart } from "~/components/balance-history-graph";
+import { AccountPageBanner } from "~/components/account-page-banner";
 
 export default async function AccountPage(props: {
   params: Promise<{ accountId: string }>;
@@ -75,6 +76,7 @@ export default async function AccountPage(props: {
 
   return (
     <div className="mx-auto max-w-4xl p-6">
+      <AccountPageBanner accountInformation={accountInformation}/>
       <div className="mb-8 flex items-center justify-center gap-4">
         {accountInformation.plaidItem.institutionLogo ? (
           <Image
@@ -163,9 +165,7 @@ export default async function AccountPage(props: {
               <div key={transaction.id} className="hover:bg-card p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">
-                      {transaction.name}
-                    </p>
+                    <p className="font-medium">{transaction.name}</p>
                     <p className="text-muted-foreground">
                       {formatDate(transaction.date)}
                     </p>

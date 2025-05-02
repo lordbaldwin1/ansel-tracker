@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+
 type UpdateResponse = {
   success: boolean;
   message: string;
@@ -57,7 +58,6 @@ export default function UpdateBalancesButton({ userId }: { userId: string }) {
     <Button
       onClick={handleUpdateBalances}
       disabled={isUpdating}
-      variant="outline"
     >
       {isUpdating ? "Updating..." : "Update Balances"}
     </Button>
