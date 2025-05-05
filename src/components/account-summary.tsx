@@ -66,6 +66,7 @@ export default function AccountSummary(props: {
                         <Link
                           className="mt-4 w-full"
                           href={`/account/${item.plaid_account?.id}`}
+                          prefetch={true}
                         >
                           <Button variant="outline" className="w-full">
                             <LinkIcon className="h-4 w-4" />
