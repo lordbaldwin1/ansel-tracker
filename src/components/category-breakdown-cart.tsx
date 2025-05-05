@@ -14,11 +14,9 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { TrendingUp } from "lucide-react";
 import { useMediaQuery } from "~/hooks/use-media-query";
 
 const chartConfig = {
@@ -149,14 +147,14 @@ const CategoryPieChart = (props: {
   })()!;
 
   return (
-    <Card className="flex flex-col justify-center w-full">
-      <CardHeader className="items-center pb-0">
-        <CardTitle className={currentConfig.textSize}>{props.timeRange}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="flex flex-col h-full">
+      <div className="mb-4 text-center">
+        <h3 className="text-xl font-semibold">{props.timeRange}</h3>
+      </div>
+      <div className="flex-1 flex items-center justify-center">
         <ChartContainer
           config={chartConfig}
-          className={`mx-auto aspect-square max-h-[${currentConfig.maxHeight}px]`}
+          className="w-full aspect-square max-w-[300px]"
         >
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
@@ -217,17 +215,8 @@ const CategoryPieChart = (props: {
             </Pie>
           </PieChart>
         </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-xs sm:text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
-          Spending Overview
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing spending distribution by category
-        </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 
@@ -317,17 +306,21 @@ export const CategoryBreakdownChartLast7Days = (props: {
 export const CategoryBreakdownCard = (props: {
   chartData: Transaction[];
 }) => {
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Transactions by Category</CardTitle>
-        <CardDescription>View your spending patterns over different time periods</CardDescription>
+        <CardTitle className="text-xl">Transactions by Category</CardTitle>
+        <CardDescription className="text-sm">View your spending patterns over different time periods</CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
-        <CategoryBreakdownChartAllTime chartData={props.chartData} />
-        <CategoryBreakdownChartLast30Days chartData={props.chartData} />
-        {/* <CategoryBreakdownChartLast7Days chartData={props.chartData} /> */}
+      <CardContent>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="bg-card rounded-lg p-6">
+            <CategoryBreakdownChartAllTime chartData={props.chartData} />
+          </div>
+          <div className="bg-card rounded-lg p-6">
+            <CategoryBreakdownChartLast30Days chartData={props.chartData} />
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

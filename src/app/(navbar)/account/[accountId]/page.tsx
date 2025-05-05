@@ -1,6 +1,4 @@
 import { eq } from "drizzle-orm";
-import { PiggyBank } from "lucide-react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSession } from "~/lib/auth/getSession";
 import { db } from "~/server/db";
@@ -14,7 +12,6 @@ import { formatCurrency, formatDate } from "~/lib/utils";
 import TransactionsButton from "~/components/transactions-button";
 import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
 import { Suspense } from "react";
-import UpdateSingleBalanceButton from "~/components/single-balance-button";
 import { BalanceHistoryChart } from "~/components/balance-history-graph";
 import { AccountPageBanner } from "~/components/account-page-banner";
 
@@ -74,80 +71,17 @@ export default async function AccountPage(props: {
     getAccountBalances(urlDecodedAccountId),
   ]);
 
+  if (!mostRecentBalance || !transactions || !balanceHistory) {
+    return notFound();
+  }
+
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <AccountPageBanner accountInformation={accountInformation}/>
-      <div className="mb-8 flex items-center justify-center gap-4">
-        {accountInformation.plaidItem.institutionLogo ? (
-          <Image
-            src={accountInformation.plaidItem.institutionLogo}
-            alt="Institution Logo"
-            width={64}
-            height={64}
-            className="rounded-lg"
-          />
-        ) : (
-          <PiggyBank className="h-16 w-16" />
-        )}
-        <div>
-          <h1 className="text-2xl font-bold">{accountInformation.name}</h1>
-          <p>{accountInformation.plaidItem.institutionName}</p>
-        </div>
-      </div>
-
-      <div className="flex justify-center">
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="rounded-lg p-6 shadow">
-            <h2 className="mb-4 text-lg font-semibold">Account Details</h2>
-            <div className="space-y-2">
-              <p className="text-muted-foreground">
-                <span className="text-foreground">Type:</span>{" "}
-                {accountInformation.type}
-              </p>
-              <p className="text-muted-foreground">
-                <span className="text-foreground">Subtype:</span>{" "}
-                {accountInformation.subtype}
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-lg p-6 shadow">
-            <h2 className="mb-4 text-lg font-semibold">Current Balance</h2>
-            <div className="space-y-2">
-              <p>
-                <span>Current:</span>{" "}
-                {formatCurrency(mostRecentBalance?.current ?? 0)}
-              </p>
-              <p>
-                <span>Available:</span>{" "}
-                {formatCurrency(mostRecentBalance?.available ?? 0)}
-              </p>
-              {mostRecentBalance?.limit && (
-                <p>
-                  <span>Limit:</span> {formatCurrency(mostRecentBalance.limit)}
-                </p>
-              )}
-              {mostRecentBalance?.date && (
-                <p className="text-muted-foreground">
-                  As of {formatDate(mostRecentBalance.date)}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-8 flex items-center justify-center gap-4">
-        <TransactionsButton
-          accountId={urlDecodedAccountId}
-          userId={authAccount.userId}
-        />
-        <UpdateSingleBalanceButton
-          plaidAccountId={urlDecodedAccountId}
-          userId={authAccount.userId}
-        />
-        {/* <Button>Update Both (TODO)</Button> */}
-      </div>
+      <AccountPageBanner
+        accountInformation={accountInformation}
+        balance={mostRecentBalance}
+        userId={authAccount.userId}
+      />
       <Suspense fallback={<div>Loading...</div>}>
         <BalanceHistoryChart accountBalances={balanceHistory} />
       </Suspense>
@@ -157,8 +91,12 @@ export default async function AccountPage(props: {
 
       {transactions.length > 0 && (
         <div className="rounded-lg shadow">
-          <div className="border-b p-6">
+          <div className="flex flex-row justify-between border-b p-6">
             <h2 className="text-lg font-semibold">Transaction History</h2>
+            <TransactionsButton
+              accountId={urlDecodedAccountId}
+              userId={authAccount.userId}
+            />
           </div>
           <div className="divide-y">
             {transactions.map((transaction) => (

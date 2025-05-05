@@ -50,8 +50,8 @@ export function BalanceHistoryChart(props: {
     <Card className="mb-4">
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Balance History</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl">Balance History</CardTitle>
+          <CardDescription className="text-sm">
             Showing balance history over time
           </CardDescription>
         </div>
@@ -66,7 +66,9 @@ export function BalanceHistoryChart(props: {
             data={historyChartData}
             margin={{
               left: 12,
-              right: 12,
+              right: 24,
+              top: 12,
+              bottom: 32
             }}
           >
             <CartesianGrid vertical={false} />
@@ -74,8 +76,9 @@ export function BalanceHistoryChart(props: {
               dataKey="date"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
+              tickMargin={12}
+              minTickGap={24}
+              interval="preserveStartEnd"
               tickFormatter={(value: string) => {
                 const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
