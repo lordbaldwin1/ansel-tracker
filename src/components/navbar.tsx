@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import AuthButtonsDropdown from "./auth/auth-buttons-dropdown";

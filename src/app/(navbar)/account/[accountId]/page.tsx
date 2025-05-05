@@ -14,7 +14,8 @@ import { CategoryBreakdownCard } from "~/components/category-breakdown-cart";
 import { Suspense } from "react";
 import { BalanceHistoryChart } from "~/components/balance-history-graph";
 import { AccountPageBanner } from "~/components/account-page-banner";
-
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 export default async function AccountPage(props: {
   params: Promise<{ accountId: string }>;
 }) {
@@ -77,6 +78,11 @@ export default async function AccountPage(props: {
 
   return (
     <div className="mx-auto max-w-4xl p-6">
+      <div className="mb-4">
+        <Link href="/" prefetch={true} className="text-sm text-muted-foreground hover:text-primary">
+          <ArrowLeftIcon className="w-4 h-4 mr-2" /> Back to Dashboard
+        </Link>
+      </div>
       <AccountPageBanner
         accountInformation={accountInformation}
         balance={mostRecentBalance}
